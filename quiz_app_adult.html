@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>12과: 하나님은 신실하시다 - 성경 퀴즈</title>
+    <style>
+        :root {
+            --primary-color: #1a73e8; /* Google Blue style */
+            --background-color: #f8f9fa;
+            --surface-color: #ffffff;
+            --text-color: #202124;
+            --subtext-color: #5f6368;
+            --correct-color: #1e8e3e;
+            --wrong-color: #d93025;
+            --border-radius: 12px;
+            --box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--surface-color);
+            width: 100%;
+            max-width: 700px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Header */
+        .header {
+            padding: 24px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        .progress-indicator {
+            font-size: 0.9rem;
+            color: var(--subtext-color);
+            background: #e8f0fe;
+            padding: 4px 12px;
+            border-radius: 16px;
+        }
+
+        /* Quiz Content */
+        .quiz-content {
+            padding: 30px;
+        }
+
+        .question-text {
+            font-size: 1.3rem;
+            font-weight: 500;
+            line-height: 1.5;
+            margin-bottom: 24px;
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-btn {
+            padding: 16px 20px;
+            border: 1px solid #dadce0;
+            border-radius: 8px;
+            background: #fff;
+            color: var(--text-color);
+            font-size: 1rem;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background-color: #f1f3f4;
+            border-color: #d2e3fc;
+        }
+
+        .option-btn:disabled {
+            cursor: default;
+        }
+
+        /* States */
+        .option-btn.correct {
+            background-color: #e6f4ea;
+            border-color: var(--correct-color);
+            color: var(--correct-color);
+            font-weight: 600;
+        }
+
+        .option-btn.wrong {
+            background-color: #fce8e6;
+            border-color: var(--wrong-color);
+            color: var(--wrong-color);
+        }
+
+        .option-btn.correct::after {
+            content: "✓";
+            position: absolute;
+            right: 20px;
+            font-weight: bold;
+        }
+
+        .option-btn.wrong::after {
+            content: "✕";
+            position: absolute;
+            right: 20px;
+            font-weight: bold;
+        }
+
+        /* Feedback Section */
+        .feedback-section {
+            margin-top: 24px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary-color);
+            display: none; /* Hidden by default */
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .feedback-title {
+            font-weight: bold;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .feedback-text {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: var(--subtext-color);
+        }
+
+        /* Footer / Navigation */
+        .footer {
+            padding: 20px 30px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .next-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 24px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: none; /* Hidden until answered */
+        }
+
+        .next-btn:hover {
+            background-color: #1765cc;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        /* Result Screen */
+        .result-screen {
+            text-align: center;
+            padding: 50px 30px;
+            display: none;
+        }
+
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin: 0 auto 24px;
+        }
+
+        .result-message {
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+        }
+
+        .result-submessage {
+            color: var(--subtext-color);
+            margin-bottom: 32px;
+        }
+
+        .restart-btn {
+            background-color: white;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            padding: 12px 24px;
+            border-radius: 24px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .restart-btn:hover {
+            background-color: #e8f0fe;
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 0;
+                height: 100vh;
+                max-height: none;
+            }
+            body {
+                padding: 0;
+            }
+            .question-text {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="quiz-container">
+    <div id="quiz-view">
+        <div class="header">
+            <h1>하나님은 신실하시다</h1>
+            <span class="progress-indicator" id="progress">1 / 15</span>
+        </div>
+        
+        <div class="quiz-content">
+            <div class="question-text" id="question">문제가 여기에 표시됩니다.</div>
+            <div class="options-list" id="options">
+                </div>
+
+            <div class="feedback-section" id="feedback">
+                <span class="feedback-title" id="feedback-title">정답입니다!</span>
+                <p class="feedback-text" id="feedback-text">해설 내용</p>
+            </div>
+        </div>
+
+        <div class="footer">
+            <button class="next-btn" id="next-btn" onclick="nextQuestion()">다음 문제</button>
+        </div>
+    </div>
+
+    <div id="result-view" class="result-screen">
+        <div class="score-circle" id="final-score">100</div>
+        <h2 class="result-message">학습 완료!</h2>
+        <p class="result-submessage">12과 '하나님은 신실하시다' 학습을 마쳤습니다.</p>
+        <button class="restart-btn" onclick="restartQuiz()">다시 풀기</button>
+    </div>
+</div>
+
+<script>
+    // 퀴즈 데이터 (15문제 - PDF 내용 기반)
+    const quizData = [
+        {
+            question: "이번 12과의 기억절인 여호수아 21장 45절에 따르면, 하나님께서 이스라엘 족속에게 말씀하신 선한 말씀은 어떻게 되었습니까?",
+            options: ["대부분 응하였으나 일부는 남았다", "하나도 남음이 없이 다 응하였다", "이스라엘의 불순종으로 취소되었다", "미래에 성취될 것이다"],
+            correct: 1,
+            explanation: "여호수아 21장 45절은 '여호와께서 이스라엘 족속에게 말씀하신 선한 말씀이 하나도 남음이 없이 다 응하였더라'라고 기록하고 있습니다. "
+        },
+        {
+            question: "존 F. 케네디 대통령의 취임 연설을 인용하며 교과는 무엇을 강조하고 있습니까?",
+            options: ["국가의 부강함", "개인의 권리와 자유", "특권보다 책임, 그리고 하나님의 일", "군사력의 중요성"],
+            correct: 2,
+            explanation: "교과는 케네디가 국민에게 특권보다 책임을 중요하게 여기도록 격려했으며, 이 땅을 향한 하나님의 일이야말로 우리에게 맡겨진 일임을 강조했다고 설명합니다. "
+        },
+        {
+            question: "여호수아 23장의 주된 초점은 무엇입니까?",
+            options: ["과거의 승리 회고", "땅 분배의 세부 사항", "미래에 오직 하나님만을 경배할 것", "성막 건축 지침"],
+            correct: 2,
+            explanation: "여호수아 23장은 미래에 더욱 초점을 맞추며 어떻게 오직 하나님만을 경배할 것인지에 대해 말하고 있습니다. "
+        },
+        {
+            question: "여호수아 21장에서 '모든'을 의미하는 히브리어 '콜(kol)'이 반복 사용된 이유는 무엇입니까?",
+            options: ["이스라엘의 군사력을 칭송하기 위해", "모든 땅을 정복하지 못했음을 비판하기 위해", "땅이 여호와의 선물이며 인간의 공로가 아님을 강조하기 위해", "모든 지파가 불만 없이 땅을 받았음을 보여주기 위해"],
+            correct: 2,
+            explanation: "'콜'이라는 단어의 반복은 그 땅이 여호와의 선물이며, 그것을 얻은 것에 대해 이스라엘이 어떤 공로도 주장할 수 없다는 진리를 강조합니다. "
+        },
+        {
+            question: "교과에서 제시한 'TMI 실천' 내용으로 적절하지 않은 것은 무엇입니까?",
+            options: ["자녀의 친구를 집으로 초대하세요", "이웃에게 비타민을 나눠 주세요", "필요한 사람에게 휴대용 물티슈를 건네세요", "모르는 사람에게 돈을 기부하세요"],
+            correct: 3,
+            explanation: "교과에 제시된 TMI 실천 사항은 자녀 친구 초대, 비타민 나누기, 휴대용 물티슈 건네기입니다. "
+        },
+        {
+            question: "여호수아가 이스라엘 백성에게 주변 국가들과 명확한 경계를 세우라고 경고한 가장 큰 이유는 무엇입니까?",
+            options: ["그들의 군사력이 위협적이었기 때문에", "전염병을 예방하기 위해서", "영토 분쟁을 피하기 위해서", "그들의 사상과 가치관이 영적 순결을 해칠 수 있기 때문에"],
+            correct: 3,
+            explanation: "진짜 위험은 군사력이 아니라 그들의 사상과 가치관이며, 이는 이스라엘의 영적 순결을 잃고 우상 숭배로 이어질 수 있기 때문입니다. "
+        },
+        {
+            question: "이스라엘이 가나안 땅을 차지할 수 있었던 근본적인 이유는 무엇입니까?",
+            options: ["탁월한 군사 전략", "강력한 무기", "하나님이 그들을 위해 싸우셨기 때문", "주변 국가들의 내부 분열"],
+            correct: 2,
+            explanation: "여호수아는 땅의 정복이 가능했던 것은 주님께서 그들을 위해 싸우셨기 때문이라고 설명합니다. "
+        },
+        {
+            question: "성경에서 하나님의 진노에 대한 설명으로 올바른 것은 무엇입니까?",
+            options: ["하나님의 사랑과 양립할 수 없다", "감정적이고 예측할 수 없는 반응이다", "죄와 악에 대한 그분의 거룩하심과 정의의 표현이다", "구약에만 존재하고 신약에는 없다"],
+            correct: 2,
+            explanation: "하나님의 진노는 죄와 악을 마주할 때 그분의 거룩하심과 의로우심을 보이시는 것이며, 정의를 옹호하는 것입니다. "
+        },
+        {
+            question: "하나님께 '밀착하다(dabaq)'라는 단어가 사용된 다른 성경의 용례는 무엇입니까?",
+            options: ["왕과 신하의 관계", "남편과 아내의 결혼 약속, 룻의 충성", "목자와 양의 관계", "주인과 종의 계약"],
+            correct: 1,
+            explanation: "히브리어 '다바크'는 남편과 아내 사이의 결혼 약속이나 나오미에게 보인 룻의 충성(룻 1:14)을 묘사할 때 사용되었습니다. "
+        },
+        {
+            question: "여호수아는 이스라엘의 승리가 '이미 성취된 불변의 현실'이 아니라 무엇이라고 말합니까?",
+            options: ["우연의 산물", "스스로의 노력으로 지켜야 할 것", "하나님을 끊임없이 의지할 때 얻을 수 있는 가능성", "운명적으로 정해진 것"],
+            correct: 2,
+            explanation: "승리는 불변하는 현실이 아니라, 하나님께서 도우실 것을 신실하게 끊임없이 의지할 때 언제나 얻을 수 있는 가능성입니다. "
+        },
+        {
+            question: "여호수아 23장 16절에서 경고하는 내용으로 알맞은 것은 무엇입니까?",
+            options: ["가나안 족속을 멸하지 않으면 그들이 너희의 종이 될 것이다", "언약을 어기고 다른 신을 섬기면 속히 망할 것이다", "성전을 건축하지 않으면 복을 받지 못할 것이다", "왕을 세우면 백성들이 고통받을 것이다"],
+            correct: 1,
+            explanation: "주께서 가나안에게처럼 언약을 어기는 이스라엘에게도 진노하실 수 있으며, 그들이 언약을 위반하면 멸망할 것이라고 경고합니다. "
+        },
+        {
+            question: "하나님을 사랑하라는 계명이 강요가 아닌 이유는 무엇입니까?",
+            options: ["지키지 않아도 처벌이 없기 때문에", "우리의 감정에 호소하기 때문에", "하나님의 자비와 사랑에 근거한 관계에서 비롯되기 때문에", "선택 사항이기 때문에"],
+            correct: 2,
+            explanation: "하나님은 계명에 대한 순종이 당신이 그들에게 베푸신 놀라운 자비와 사랑에 근거한 그분과의 개인적인 관계에서 비롯되기를 바라셨습니다. "
+        },
+        {
+            question: "부조와 선지자 522페이지 인용문에 따르면, 사탄은 하나님의 사랑에 대해 어떻게 기만합니까?",
+            options: ["하나님은 사랑이 없으신 분이라고 주장한다", "사랑이 너무 크기에 죄를 지어도 무조건 용서하실 것이라고 주장한다", "하나님은 특정 민족만 사랑하신다고 주장한다", "하나님의 사랑은 조건부라고 주장한다"],
+            correct: 1,
+            explanation: "사탄은 하나님의 사랑이 너무나 크기 때문에 하나님께서 그들의 죄를(결과 없이) 용서하실 것이라는 그럴듯한 이론으로 사람들을 기만합니다. "
+        },
+        {
+            question: "여호수아의 고별 설교에서 그가 궁극적으로 이스라엘에게 촉구한 것은 무엇입니까?",
+            options: ["더 넓은 영토 확장", "강력한 왕정 체제 수립", "오직 여호와만이 합당하시니 그분만 섬길 것", "이방 민족과의 평화 조약"],
+            correct: 2,
+            explanation: "여호수아는 과거에 행하신 하나님의 신실하신 행사를 돌아보며, 오직 여호와만이 경배받기에 합당하신 분임을 결정하도록 촉구했습니다. "
+        }
+    ];
+
+    // 앱 상태 변수
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let isAnswered = false;
+
+    // DOM 요소
+    const quizView = document.getElementById('quiz-view');
+    const resultView = document.getElementById('result-view');
+    const questionEl = document.getElementById('question');
+    const optionsEl = document.getElementById('options');
+    const feedbackEl = document.getElementById('feedback');
+    const feedbackTitle = document.getElementById('feedback-title');
+    const feedbackText = document.getElementById('feedback-text');
+    const nextBtn = document.getElementById('next-btn');
+    const progressEl = document.getElementById('progress');
+    const finalScoreEl = document.getElementById('final-score');
+
+    // 퀴즈 초기화 및 시작
+    function initQuiz() {
+        currentQuestionIndex = 0;
+        score = 0;
+        showQuizView();
+        loadQuestion();
+    }
+
+    // 문제 로드
+    function loadQuestion() {
+        isAnswered = false;
+        const currentData = quizData[currentQuestionIndex];
+        
+        // UI 리셋
+        feedbackEl.style.display = 'none';
+        nextBtn.style.display = 'none';
+        optionsEl.innerHTML = '';
+        
+        // 진행률 업데이트
+        progressEl.textContent = `${currentQuestionIndex + 1} / ${quizData.length}`;
+        
+        // 문제 텍스트 설정
+        questionEl.textContent = currentData.question;
+
+        // 보기 버튼 생성
+        currentData.options.forEach((option, index) => {
+            const btn = document.createElement('button');
+            btn.className = 'option-btn';
+            btn.textContent = option;
+            btn.onclick = () => checkAnswer(index);
+            optionsEl.appendChild(btn);
+        });
+    }
+
+    // 정답 확인
+    function checkAnswer(selectedIndex) {
+        if (isAnswered) return;
+        isAnswered = true;
+
+        const currentData = quizData[currentQuestionIndex];
+        const buttons = optionsEl.getElementsByClassName('option-btn');
+        const isCorrect = selectedIndex === currentData.correct;
+
+        // 스타일 적용
+        if (isCorrect) {
+            buttons[selectedIndex].classList.add('correct');
+            score++;
+            feedbackTitle.textContent = "정답입니다!";
+            feedbackTitle.style.color = "var(--correct-color)";
+        } else {
+            buttons[selectedIndex].classList.add('wrong');
+            buttons[currentData.correct].classList.add('correct'); // 정답 표시
+            feedbackTitle.textContent = "오답입니다.";
+            feedbackTitle.style.color = "var(--wrong-color)";
+        }
+
+        // 나머지 버튼 비활성화
+        Array.from(buttons).forEach(btn => btn.disabled = true);
+
+        // 피드백 표시
+        feedbackText.textContent = currentData.explanation;
+        feedbackEl.style.display = 'block';
+        nextBtn.style.display = 'block';
+    }
+
+    // 다음 문제로 이동
+    function nextQuestion() {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < quizData.length) {
+            loadQuestion();
+        } else {
+            showResult();
+        }
+    }
+
+    // 결과 화면 표시
+    function showResult() {
+        quizView.style.display = 'none';
+        resultView.style.display = 'block';
+        
+        // 점수 애니메이션 (간단한 버전)
+        finalScoreEl.textContent = Math.round((score / quizData.length) * 100);
+        
+        // 점수에 따른 메시지 변경
+        const msgEl = document.querySelector('.result-message');
+        if (score === quizData.length) {
+            msgEl.textContent = "완벽합니다! 하나님의 신실하심을 깊이 이해하셨네요.";
+        } else if (score >= quizData.length * 0.7) {
+            msgEl.textContent = "훌륭합니다! 교과 내용을 잘 이해하고 계십니다.";
+        } else {
+            msgEl.textContent = "수고하셨습니다. 다시 한번 복습해 볼까요?";
+        }
+    }
+
+    // 다시 풀기
+    function restartQuiz() {
+        initQuiz();
+    }
+
+    // 화면 전환 헬퍼
+    function showQuizView() {
+        quizView.style.display = 'block';
+        resultView.style.display = 'none';
+    }
+
+    // 앱 시작
+    initQuiz();
+
+</script>
+
+</body>
+</html>
