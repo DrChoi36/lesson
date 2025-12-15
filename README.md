@@ -38,4 +38,4 @@
 <img width="732" height="566" alt="image" src="https://github.com/user-attachments/assets/4ffcd8df-27d9-41e8-b9d5-3f625ed00f26" />
 
 ---
-Developed by [Dr choi]
+Developed by Dr choi
